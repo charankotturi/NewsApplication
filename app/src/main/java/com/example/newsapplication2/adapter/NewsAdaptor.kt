@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -17,7 +18,6 @@ import com.example.newsapplication2.models.Article
 import java.util.*
 
 class NewsAdaptor(
-    context: Context
 ) : RecyclerView.Adapter<NewsAdaptor.ArticleViewHolder>() {
 
     inner class ArticleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
@@ -25,6 +25,7 @@ class NewsAdaptor(
         val txtTitle: TextView = itemView.findViewById<TextView>(R.id.txtTitle)
         val txtDescription: TextView = itemView.findViewById<TextView>(R.id.txtDescription)
         val txtAuthor: TextView = itemView.findViewById<TextView>(R.id.txtAuthor)
+        val cvParent: CardView = itemView.findViewById(R.id.cvParent)
     }
 
     private val diffList = object : DiffUtil.ItemCallback<Article>() {
@@ -37,7 +38,7 @@ class NewsAdaptor(
         }
     }
 
-    private val differ = AsyncListDiffer(this, diffList)
+    val differ = AsyncListDiffer(this, diffList)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleViewHolder {
         return ArticleViewHolder(
@@ -58,7 +59,17 @@ class NewsAdaptor(
         holder.txtTitle.text = article.title
         holder.txtAuthor.text = article.author
         holder.txtDescription.text = article.description
+        holder.cvParent.setOnClickListener{
+            onItemClickListener?.let {
+                it(differ.currentList[position])
+            }
+        }
+    }
 
+    private var onItemClickListener: ((Article) -> Unit)? = null
+
+    fun setOnClickListener(Listener: (Article) -> Unit){
+        onItemClickListener = Listener
     }
 
     override fun getItemCount(): Int {
